@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
+import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import java.util.*
@@ -28,5 +29,14 @@ class RestExceptionHandler: ResponseEntityExceptionHandler() {
 		body["errors"] = errors
 
 		return ResponseEntity(body, headers, status)
+	}
+
+	@ExceptionHandler(MissingUserIdHeaderException::class)
+	fun handleMissingUserIdHeaderException(ex: MissingUserIdHeaderException): ResponseEntity<Any> {
+		return ResponseEntity(ex.message, HttpHeaders(), HttpStatus.BAD_REQUEST)
+	}
+	@ExceptionHandler(InvalidUserIdHeaderException::class)
+	fun handleInvalidUserIdHeaderException(ex: InvalidUserIdHeaderException): ResponseEntity<Any> {
+		return ResponseEntity(ex.message, HttpHeaders(), HttpStatus.FORBIDDEN)
 	}
 }
