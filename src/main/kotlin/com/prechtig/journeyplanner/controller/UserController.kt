@@ -1,5 +1,6 @@
 package com.prechtig.journeyplanner.controller
 
+import com.prechtig.journeyplanner.helper.userNotFound
 import com.prechtig.journeyplanner.model.Journey
 import com.prechtig.journeyplanner.model.User
 import com.prechtig.journeyplanner.service.UserService
@@ -10,9 +11,6 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/user")
 class UserController(val userService: UserService) {
-
-	@GetMapping("/all")
-	fun findAllUsers() = userService.findAll()
 
 	@PostMapping("/{userName}")
 	@ResponseStatus(HttpStatus.CREATED)
@@ -25,10 +23,8 @@ class UserController(val userService: UserService) {
 	}
 
 	@GetMapping("/{userId}/journeys")
-	fun journeysByUser(@PathVariable userId: Long): List<Journey>? {
-		return listOf(
-			Journey("København", "Køge"),
-			Journey("København", "Maribo")
-		)
+	fun journeysByUser(@PathVariable userId: Long): ResponseEntity<List<Journey>?> {
+		val user = userService.findById(userId) ?: throw userNotFound(userId)
+		return ResponseEntity(user.journeys.values.toList(), HttpStatus.OK)
 	}
 }

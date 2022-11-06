@@ -15,17 +15,10 @@ class RedisConfiguration {
 	@Bean
 	fun redisCacheManagerBuilderCustomizer(): RedisCacheManagerBuilderCustomizer? {
 		return RedisCacheManagerBuilderCustomizer { builder: RedisCacheManagerBuilder ->
-			builder
-				.withCacheConfiguration(
-					"journeyCache",
-					RedisCacheConfiguration.defaultCacheConfig()
-						.entryTtl(Duration.ofMinutes(10))
-				)
-				.withCacheConfiguration(
-					"userCache",
-					RedisCacheConfiguration.defaultCacheConfig()
-						.entryTtl(Duration.ofMinutes(10))
-				)
+			builder.withCacheConfiguration(
+				"userCache",
+				RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(10))
+			)
 		}
 	}
 

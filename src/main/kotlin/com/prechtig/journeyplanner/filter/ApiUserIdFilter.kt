@@ -2,11 +2,12 @@ package com.prechtig.journeyplanner.filter
 
 import com.prechtig.journeyplanner.error.InvalidUserIdHeaderException
 import com.prechtig.journeyplanner.error.MissingUserIdHeaderException
+import com.prechtig.journeyplanner.helper.setUserId
+import com.prechtig.journeyplanner.helper.userNotFound
 import com.prechtig.journeyplanner.service.UserService
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
-import java.lang.NumberFormatException
 import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -23,8 +24,8 @@ class ApiUserIdFilter(val userService: UserService): OncePerRequestFilter() {
 			?: throw MissingUserIdHeaderException("Missing user id in the header with key 'api-user-id'")
 
 		try {
-			userService.findById(apiUserId.toLong())
-				?: throw InvalidUserIdHeaderException("User with the given id '$apiUserId' not found")
+			val user = userService.findById(apiUserId.toLong()) ?: throw userNotFound(apiUserId.toLong())
+			request.session.setUserId(user.id!!)
 		} catch (ex: NumberFormatException) {
 			throw InvalidUserIdHeaderException("Invalid format for the header 'api-user-id'. Must be a long value")
 		}
@@ -33,8 +34,6 @@ class ApiUserIdFilter(val userService: UserService): OncePerRequestFilter() {
 	}
 
 	override fun shouldNotFilter(request: HttpServletRequest): Boolean {
-		return "POST" == request.method
-				&& (request.servletPath == "/journey"
-					|| request.servletPath.startsWith("/user/"))
+		return "POST" == request.method && request.servletPath.startsWith("/user/")
 	}
 }

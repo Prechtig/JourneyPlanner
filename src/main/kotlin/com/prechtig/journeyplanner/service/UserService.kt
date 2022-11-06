@@ -1,7 +1,10 @@
 package com.prechtig.journeyplanner.service
 
+import com.prechtig.journeyplanner.error.InvalidUserIdHeaderException
+import com.prechtig.journeyplanner.model.Journey
 import com.prechtig.journeyplanner.model.User
 import com.prechtig.journeyplanner.repository.UserRepository
+import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
@@ -18,7 +21,10 @@ class UserService(val userRepository: UserRepository) {
 		return userRepository.findById(id).orElse(null)
 	}
 
-	fun findAll(): List<User> {
-		return userRepository.findAll().toList()
+	@CachePut("userCache", key = "#userId")
+	fun addJourney(userId: Long, journey: Journey): User {
+		val user = userRepository.findById(userId).orElseThrow { InvalidUserIdHeaderException("Something wrong") }
+		user.journeys[journey.id] = journey
+		return userRepository.save(user)
 	}
 }
