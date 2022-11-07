@@ -5,6 +5,7 @@ import com.prechtig.journeyplanner.model.Journey
 import com.prechtig.journeyplanner.model.User
 import com.prechtig.journeyplanner.service.UserService
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -22,8 +23,8 @@ class UserController(val userService: UserService) {
 			?: ResponseEntity(HttpStatus.NO_CONTENT)
 	}
 
-	@GetMapping("/{userId}/journeys")
-	fun journeysByUser(@PathVariable userId: Long): ResponseEntity<List<Journey>?> {
+	@GetMapping("/{userId}/journeys", produces = [MediaType.APPLICATION_JSON_VALUE])
+	fun journeysByUser(@PathVariable userId: Long): ResponseEntity<List<Journey>> {
 		val user = userService.findById(userId) ?: throw userNotFound(userId)
 		return ResponseEntity(user.journeys.values.toList(), HttpStatus.OK)
 	}
