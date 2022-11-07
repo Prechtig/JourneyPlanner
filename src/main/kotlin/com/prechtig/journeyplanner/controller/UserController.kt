@@ -26,6 +26,6 @@ class UserController(val userService: UserService) {
 	@GetMapping("/{userId}/journeys", produces = [MediaType.APPLICATION_JSON_VALUE])
 	fun journeysByUser(@PathVariable userId: Long): ResponseEntity<List<Journey>> {
 		val user = userService.findById(userId) ?: throw userNotFound(userId)
-		return ResponseEntity(user.journeys.values.toList(), HttpStatus.OK)
+		return ResponseEntity.ok(user.journeys.values.toList())
 	}
 }

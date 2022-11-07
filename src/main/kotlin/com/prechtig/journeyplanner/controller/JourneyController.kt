@@ -30,7 +30,7 @@ class JourneyController(val userService: UserService) {
 		val userId = request.session.getUserId()
 		val user = userService.findById(userId) ?: throw userNotFound(userId)
 		val journey = user.journeys[journeyId]
-		return journey?.let { ResponseEntity(it, HttpStatus.OK) }
+		return journey?.let { ResponseEntity.ok(it) }
 			?: ResponseEntity(null, HttpStatus.NO_CONTENT)
 	}
 }
